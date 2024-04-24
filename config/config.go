@@ -10,8 +10,8 @@ import (
 const (
 	dueConfigArgName      = "config"
 	dueConfigEnvName      = "DUE_CONFIG"
-	defaultConfigPath     = "./config"
-	defaultConfigFileName = "default.toml"
+	defaultConfigPath     = "./configs"
+	defaultConfigFileName = "default"
 
 	defaultRemoteConfigEnvName = "DUE_REMOTE_CONFIG"
 	defaultRemoteConfig        = "apollo"
@@ -21,13 +21,15 @@ var globalReader Reader
 
 func init() {
 	// get path from command line
-	path := flag.String(dueConfigArgName, fmt.Sprintf("%v/%v", defaultConfigPath, defaultConfigFileName))
+	filePath := getFileFullName(defaultConfigFileName, defaultConfigPath)
+	fileExtension := getFileExtension(filePath)
+	path := flag.String(dueConfigArgName, filePath)
 
 	// overwrite path from env
 	var overwritePath string
 	localEnv := env.Get(dueConfigEnvName).String()
 	if localEnv != "" {
-		overwritePath = fmt.Sprintf("%v/%v", defaultConfigPath, localEnv)
+		overwritePath = fmt.Sprintf("%v/%v.%v", defaultConfigPath, localEnv, fileExtension)
 	}
 
 	remoteEnv := env.Get(defaultRemoteConfigEnvName, defaultRemoteConfig).String()

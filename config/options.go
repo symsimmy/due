@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"github.com/BurntSushi/toml"
+	"github.com/symsimmy/due/encoding/properties"
 	"github.com/symsimmy/due/errors"
 	"gopkg.in/yaml.v3"
 	"strings"
@@ -53,6 +54,8 @@ func defaultDecoder(c *Configuration, value interface{}) error {
 		return unmarshal(c.Content, value, yaml.Unmarshal)
 	case "toml":
 		return unmarshal(c.Content, value, toml.Unmarshal)
+	case "properties":
+		return unmarshal(c.Content, value, properties.Unmarshal)
 	default:
 		return errors.New("invalid encoding format")
 	}
