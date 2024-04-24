@@ -89,11 +89,12 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 
 	if r.registry.opts.enableHealthCheck {
 		registration.Checks = append(registration.Checks, &api.AgentServiceCheck{
-			TCP:                            raw.Host,
+			TCP:                            fmt.Sprintf("%+v:%+v", overwriteHost, port),
 			Interval:                       fmt.Sprintf("%ds", r.registry.opts.healthCheckInterval),
 			Timeout:                        fmt.Sprintf("%ds", r.registry.opts.healthCheckTimeout),
 			DeregisterCriticalServiceAfter: fmt.Sprintf("%ds", r.registry.opts.deregisterCriticalServiceAfter),
 			FailuresBeforeCritical:         r.registry.opts.failuresBeforeCritical,
+			Notes:                          fmt.Sprintf("hostAddr:%+v:%+v, podAddr:%+v", overwriteHost, port, raw.Host),
 		})
 	}
 
