@@ -10,6 +10,7 @@ import (
 const (
 	dueConfigArgName      = "config"
 	dueConfigEnvName      = "DUE_CONFIG"
+	dueConfigDirEnvName   = "DUE_CONFIG_DIR"
 	defaultConfigPath     = "./configs"
 	defaultConfigFileName = "default"
 
@@ -20,8 +21,13 @@ const (
 var globalReader Reader
 
 func init() {
+	// get config dir
+	configPath := env.Get(dueConfigDirEnvName).String()
+	if len(configPath) == 0 {
+		configPath = defaultConfigPath
+	}
 	// get path from command line
-	filePath := getFileFullName(defaultConfigFileName, defaultConfigPath)
+	filePath := getFileFullName(defaultConfigFileName, configPath)
 	fileExtension := getFileExtension(filePath)
 	path := flag.String(dueConfigArgName, filePath)
 
@@ -29,7 +35,7 @@ func init() {
 	var overwritePath string
 	localEnv := env.Get(dueConfigEnvName).String()
 	if localEnv != "" {
-		overwritePath = fmt.Sprintf("%v/%v.%v", defaultConfigPath, localEnv, fileExtension)
+		overwritePath = fmt.Sprintf("%v/%v.%v", configPath, localEnv, fileExtension)
 	}
 
 	remoteEnv := env.Get(defaultRemoteConfigEnvName, defaultRemoteConfig).String()
