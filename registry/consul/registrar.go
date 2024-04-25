@@ -20,11 +20,15 @@ const (
 	metaFieldKind     = "kind"
 	metaFieldAlias    = "alias"
 	metaFieldState    = "state"
+	metaFieldWanIp    = "wan"
+	metaFieldRegion   = "region"
 )
 
 const (
 	routeKvFormat = "route/%v/%v"
 	hostIpEnvName = "MY_HOST_IP"
+	wanIpEnvName  = "MY_WAN_IP"
+	regionEnvName = "MY_REGION"
 )
 
 type registrar struct {
@@ -65,6 +69,8 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 	}
 
 	overwriteHost := env.Get(hostIpEnvName, host).String()
+	wanIp := env.Get(wanIpEnvName).String()
+	region := env.Get(regionEnvName).String()
 
 	registration := &api.AgentServiceRegistration{
 		ID:      ins.ID,
@@ -82,6 +88,12 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 	registration.Meta[metaFieldKind] = string(ins.Kind)
 	registration.Meta[metaFieldAlias] = ins.Alias
 	registration.Meta[metaFieldState] = string(ins.State)
+	if wanIp != "" {
+		registration.Meta[metaFieldWanIp] = wanIp
+	}
+	if region != "" {
+		registration.Meta[metaFieldRegion] = region
+	}
 
 	for _, event := range ins.Events {
 		registration.Tags = append(registration.Tags, strconv.Itoa(int(event)))
