@@ -179,7 +179,7 @@ func (r *defaultReader) watch() {
 
 				values := make(map[string]interface{})
 				for _, c := range cs {
-					err := r.opts.decoder(c, values)
+					err := r.opts.decoder(c, &values)
 					if err != nil {
 						continue
 					}
