@@ -88,8 +88,12 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 	registration.Meta[metaFieldKind] = string(ins.Kind)
 	registration.Meta[metaFieldAlias] = ins.Alias
 	registration.Meta[metaFieldState] = string(ins.State)
-	registration.Meta[metaFieldWanIp] = wanIp
-	registration.Meta[metaFieldRegion] = region
+	if wanIp != "" {
+		registration.Meta[metaFieldWanIp] = wanIp
+	}
+	if region != "" {
+		registration.Meta[metaFieldRegion] = region
+	}
 
 	for _, event := range ins.Events {
 		registration.Tags = append(registration.Tags, strconv.Itoa(int(event)))
