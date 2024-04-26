@@ -47,6 +47,13 @@ func NewLocator(opts ...Option) *Locator {
 			Password:   o.password,
 			MaxRetries: o.maxRetries,
 		})
+
+		statusCmd := o.client.Ping(o.ctx)
+		if statusCmd.Err() != nil {
+			log.Errorf("redis[%+v] start failed. statusCmd:%+v", o.addrs, statusCmd)
+		}
+
+		log.Infof("redis[%+v] start success.", o.addrs)
 	}
 
 	l := &Locator{}
