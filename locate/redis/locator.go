@@ -52,10 +52,10 @@ func NewLocator(opts ...Option) *Locator {
 
 		statusCmd := o.client.Ping(o.ctx)
 		if statusCmd.Err() != nil {
-			log.Errorf("redis[%+v] start failed. statusCmd:%+v", o.addrs, statusCmd)
+			log.Errorf("redis[%+v] start failed. statusCmd:%+v", o.addr, statusCmd)
+		} else {
+			log.Infof("redis[%+v] start success.", o.addr)
 		}
-
-		log.Infof("redis[%+v] start success.", o.addrs)
 	}
 
 	l := &Locator{}
