@@ -9,12 +9,12 @@ import (
 
 const (
 	dueConfigArgName      = "config"
-	dueConfigEnvName      = "DUE_CONFIG"
-	dueConfigDirEnvName   = "DUE_CONFIG_DIR"
+	dueConfigEnvName      = "GO_ENV"
+	dueConfigDirEnvName   = "CONFIG_DIR"
 	defaultConfigPath     = "./configs"
 	defaultConfigFileName = "default"
 
-	defaultRemoteConfigEnvName = "DUE_REMOTE_CONFIG"
+	defaultRemoteConfigEnvName = "REMOTE_CONFIG"
 	defaultRemoteConfig        = "apollo"
 )
 

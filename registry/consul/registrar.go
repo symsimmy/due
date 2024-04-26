@@ -26,9 +26,9 @@ const (
 
 const (
 	routeKvFormat = "route/%v/%v"
-	hostIpEnvName = "MY_HOST_IP"
-	wanIpEnvName  = "MY_WAN_IP"
-	regionEnvName = "MY_REGION"
+	hostIpEnvName = "HOST_IP"
+	wanIpEnvName  = "WAN_IP"
+	regionEnvName = "REGION"
 )
 
 type registrar struct {
