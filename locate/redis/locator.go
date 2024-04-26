@@ -40,8 +40,10 @@ func NewLocator(opts ...Option) *Locator {
 	}
 
 	if o.client == nil {
+		addrs := make([]string, 0)
+		addrs = append(addrs, o.addr)
 		o.client = redis.NewUniversalClient(&redis.UniversalOptions{
-			Addrs:      o.addrs,
+			Addrs:      addrs,
 			DB:         o.db,
 			Username:   o.username,
 			Password:   o.password,

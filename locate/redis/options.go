@@ -31,6 +31,8 @@ type options struct {
 	// 内建客户端配置，默认为[]string{"127.0.0.1:6379"}
 	addrs []string
 
+	addr string
+
 	// 数据库号
 	// 内建客户端配置，默认为0
 	db int
@@ -60,6 +62,7 @@ func defaultOptions() *options {
 	return &options{
 		ctx:        context.Background(),
 		addrs:      config.Get(defaultAddrsKey, []string{defaultAddr}).Strings(),
+		addr:       config.Get(defaultAddrsKey, defaultAddr).String(),
 		db:         config.Get(defaultDBKey, defaultDB).Int(),
 		maxRetries: config.Get(defaultMaxRetriesKey, defaultMaxRetries).Int(),
 		prefix:     config.Get(defaultPrefixKey, defaultPrefix).String(),
