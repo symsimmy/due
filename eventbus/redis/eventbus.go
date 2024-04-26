@@ -41,6 +41,13 @@ func NewEventbus(opts ...Option) *Eventbus {
 			Password:   o.password,
 			MaxRetries: o.maxRetries,
 		})
+
+		statusCmd := o.client.Ping(o.ctx)
+		if statusCmd.Err() != nil {
+			log.Errorf("[eventbus] redis[%+v] start failed. statusCmd:%+v", o.addr, statusCmd)
+		} else {
+			log.Infof("[eventbus] redis[%+v] start success.", o.addr)
+		}
 	}
 
 	eb := &Eventbus{}
