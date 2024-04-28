@@ -160,8 +160,8 @@ func (p *Proxy) UpdateGateWithWorkload() {
 	}
 	state := p.GetNodeState()
 
-	if state == cluster.Work || state == cluster.Busy {
-		p.SetNodeState(cluster.Hang)
+	if state == cluster.Work {
+		p.SetNodeState(cluster.Busy)
 	}
 }
 
@@ -174,6 +174,5 @@ func (p *Proxy) celebrateWorkload() bool {
 	}
 
 	totalCpu := int32(cpuNum) * p.gate.opts.workloadStat
-	res := (stat / int64(totalCpu)) >= 1
-	return res
+	return stat >= int64(totalCpu)
 }
