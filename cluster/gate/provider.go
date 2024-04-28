@@ -30,6 +30,8 @@ func (p *provider) Bind(ctx context.Context, cid, uid int64) error {
 		_, _ = p.gate.session.Unbind(uid)
 	}
 
+	p.gate.proxy.UpdateGateWithWorkload()
+
 	log.Infof("cid:%+v,uid:%+v bind to gate %+v.", cid, uid, p.gate.opts.id)
 
 	return err
@@ -50,6 +52,8 @@ func (p *provider) Unbind(ctx context.Context, uid int64) error {
 	if err != nil {
 		return err
 	}
+
+	p.gate.proxy.UpdateGateWithWorkload()
 
 	log.Infof("cid:%+v,uid:%+v unbind to gate.", cid, uid)
 

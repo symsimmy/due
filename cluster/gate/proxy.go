@@ -7,6 +7,7 @@ import (
 	"github.com/symsimmy/due/log"
 	"github.com/symsimmy/due/packet"
 	"github.com/symsimmy/due/session"
+	"runtime"
 	"strings"
 )
 
@@ -136,4 +137,42 @@ func (p *Proxy) GetSession() *session.Session {
 // GetId 获取Gate Id
 func (p *Proxy) GetId() string {
 	return p.gate.opts.id
+}
+
+// GetNodeState 获取当前节点状态
+func (p *Proxy) GetNodeState() cluster.State {
+	return p.gate.getState()
+}
+
+// SetNodeState 设置当前节点状态
+func (p *Proxy) SetNodeState(state cluster.State) {
+	p.gate.setState(state)
+}
+
+// Stat 统计会话总数
+func (p *Proxy) Stat(ctx context.Context, kind session.Kind) (int64, error) {
+	return p.link.Stat(ctx, kind)
+}
+
+func (p *Proxy) UpdateGateWithWorkload() {
+	if !p.celebrateWorkload() {
+		return
+	}
+	state := p.GetNodeState()
+
+	if state == cluster.Work {
+		p.SetNodeState(cluster.Busy)
+	}
+}
+
+func (p *Proxy) celebrateWorkload() bool {
+	cpuNum := runtime.NumCPU()
+	stat, err := p.Stat(p.gate.ctx, session.User)
+	if err != nil {
+		log.Errorf("[Workload] workload get stat failed, %+v", err)
+		return false
+	}
+
+	totalCpu := int32(cpuNum) * p.gate.opts.workloadStat
+	return stat >= int64(totalCpu)
 }

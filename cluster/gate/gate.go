@@ -16,7 +16,9 @@ import (
 	"github.com/symsimmy/due/session"
 	"github.com/symsimmy/due/transport"
 	"strconv"
+	"sync/atomic"
 	"time"
+	"unsafe"
 
 	"github.com/symsimmy/due/component"
 	"github.com/symsimmy/due/log"
@@ -29,6 +31,7 @@ type Gate struct {
 	opts     *options
 	ctx      context.Context
 	cancel   context.CancelFunc
+	state    cluster.State
 	proxy    *Proxy
 	instance *registry.ServiceInstance
 	rpc      transport.Server
@@ -314,4 +317,40 @@ func (g *Gate) debugPrint() {
 	log.Debugf("gate server startup successful")
 	log.Debugf("%s server listen on %s", g.opts.server.Protocol(), g.opts.server.Addr())
 	log.Debugf("%s server listen on %s", g.rpc.Scheme(), g.rpc.Addr())
+}
+
+// 设置节点状态
+func (g *Gate) setState(state cluster.State) {
+	if g.checkState(state) {
+		return
+	}
+
+	atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&g.state)), unsafe.Pointer(&state))
+
+	if g.instance != nil {
+		g.instance.State = g.getState()
+		for i := 0; i < 3; i++ {
+			ctx, cancel := context.WithTimeout(g.ctx, 10*time.Second)
+			err := g.opts.registry.Register(ctx, g.instance)
+			cancel()
+			if err == nil {
+				break
+			}
+		}
+	}
+
+	return
+}
+
+// 获取节点状态
+func (g *Gate) getState() cluster.State {
+	if state := (*cluster.State)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&g.state)))); state == nil {
+		return cluster.Shut
+	} else {
+		return *state
+	}
+}
+
+func (g *Gate) checkState(state cluster.State) bool {
+	return g.getState() == state
 }

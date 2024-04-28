@@ -25,46 +25,50 @@ import (
 )
 
 const (
-	defaultName    = "gate"           // 默认名称
-	defaultTimeout = 30 * time.Second // 默认超时时间
-	defaultCodec   = "proto"          // 默认编解码器名称
+	defaultName         = "gate"           // 默认名称
+	defaultTimeout      = 30 * time.Second // 默认超时时间
+	defaultCodec        = "proto"          // 默认编解码器名称
+	defaultWorkloadStat = 500
 )
 
 const (
-	defaultIDKey        = "config.cluster.gate.id"
-	defaultNameKey      = "config.cluster.gate.name"
-	defaultTimeoutKey   = "config.cluster.gate.timeout"
-	defaultCodecKey     = "config.cluster.gate.codec"
-	defaultDecryptorKey = "config.cluster.gate.decryptor"
-	defaultEncryptorKey = "config.cluster.node.encryptor"
+	defaultIDKey           = "config.cluster.gate.id"
+	defaultNameKey         = "config.cluster.gate.name"
+	defaultTimeoutKey      = "config.cluster.gate.timeout"
+	defaultCodecKey        = "config.cluster.gate.codec"
+	defaultDecryptorKey    = "config.cluster.gate.decryptor"
+	defaultEncryptorKey    = "config.cluster.node.encryptor"
+	defaultWorkloadStatKey = "config.workload.stat"
 )
 
 type Option func(o *options)
 
 type options struct {
-	id          string                // 实例ID
-	name        string                // 实例名称
-	ctx         context.Context       // 上下文
-	timeout     time.Duration         // RPC调用超时时间
-	server      network.Server        // 网关服务器
-	wsServer    network.Server        // websocket 网关服务器
-	locator     locate.Locator        // 用户定位器
-	registry    registry.Registry     // 服务注册器
-	codec       encoding.Codec        // 编解码器
-	transporter transport.Transporter // 消息传输器
-	promServer  prometheus.PromServer // 埋点采集服务器
-	catServer   *cat.Server
-	receiveHook []hook.ReceiveHook // 接受消息hook
-	encryptor   crypto.Encryptor   // 消息加密器
-	decryptor   crypto.Decryptor
+	id           string                // 实例ID
+	name         string                // 实例名称
+	ctx          context.Context       // 上下文
+	timeout      time.Duration         // RPC调用超时时间
+	server       network.Server        // 网关服务器
+	wsServer     network.Server        // websocket 网关服务器
+	locator      locate.Locator        // 用户定位器
+	registry     registry.Registry     // 服务注册器
+	codec        encoding.Codec        // 编解码器
+	transporter  transport.Transporter // 消息传输器
+	promServer   prometheus.PromServer // 埋点采集服务器
+	catServer    *cat.Server
+	receiveHook  []hook.ReceiveHook // 接受消息hook
+	encryptor    crypto.Encryptor   // 消息加密器
+	decryptor    crypto.Decryptor
+	workloadStat int32
 }
 
 func defaultOptions() *options {
 	opts := &options{
-		ctx:     context.Background(),
-		name:    defaultName,
-		timeout: defaultTimeout,
-		codec:   encoding.Invoke(defaultCodec),
+		ctx:          context.Background(),
+		name:         defaultName,
+		timeout:      defaultTimeout,
+		codec:        encoding.Invoke(defaultCodec),
+		workloadStat: config.Get(defaultWorkloadStatKey, defaultWorkloadStat).Int32(),
 	}
 
 	if id := config.Get(defaultIDKey).String(); id != "" {
