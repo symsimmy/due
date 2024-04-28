@@ -137,3 +137,18 @@ func (p *Proxy) GetSession() *session.Session {
 func (p *Proxy) GetId() string {
 	return p.gate.opts.id
 }
+
+// GetNodeState 获取当前节点状态
+func (p *Proxy) GetNodeState() cluster.State {
+	return p.gate.getState()
+}
+
+// SetNodeState 设置当前节点状态
+func (p *Proxy) SetNodeState(state cluster.State) {
+	p.gate.setState(state)
+}
+
+// Stat 统计会话总数
+func (p *Proxy) Stat(ctx context.Context, kind session.Kind) (int64, error) {
+	return p.link.Stat(ctx, kind)
+}
