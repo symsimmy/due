@@ -7,6 +7,7 @@ import (
 	"github.com/symsimmy/due/log"
 	"github.com/symsimmy/due/packet"
 	"github.com/symsimmy/due/session"
+	"runtime"
 	"strings"
 )
 
@@ -151,4 +152,28 @@ func (p *Proxy) SetNodeState(state cluster.State) {
 // Stat 统计会话总数
 func (p *Proxy) Stat(ctx context.Context, kind session.Kind) (int64, error) {
 	return p.link.Stat(ctx, kind)
+}
+
+func (p *Proxy) UpdateGateWithWorkload() {
+	if !p.celebrateWorkload() {
+		return
+	}
+	state := p.GetNodeState()
+
+	if state == cluster.Work || state == cluster.Busy {
+		p.SetNodeState(cluster.Hang)
+	}
+}
+
+func (p *Proxy) celebrateWorkload() bool {
+	cpuNum := runtime.NumCPU()
+	stat, err := p.Stat(p.gate.ctx, session.User)
+	if err != nil {
+		log.Errorf("[Workload] workload get stat failed, %+v", err)
+		return false
+	}
+
+	totalCpu := int32(cpuNum) * p.gate.opts.workloadStat
+	res := (stat / int64(totalCpu)) >= 1
+	return res
 }
