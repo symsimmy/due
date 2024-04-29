@@ -6,6 +6,9 @@ package pb;
 
 message s2c_kickoff_player_notify {
   int32 error_code = 1;
-  uint64 uid = 2;
-  string reason = 3;
+  string error = 2;
+  uint64 uid = 3;
+  int64 cid = 4;
+  int32 seq = 5;
+  int32 route = 6;
 }

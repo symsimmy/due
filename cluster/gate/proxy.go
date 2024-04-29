@@ -2,7 +2,6 @@ package gate
 
 import (
 	"context"
-	"fmt"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/common/link"
 	"github.com/symsimmy/due/errcode"
@@ -99,8 +98,11 @@ func (p *Proxy) deliver(ctx context.Context, cid, uid int64, data []byte) {
 		// 发送消息失败，往客户端推送一条kickoff的消息
 		kickoffNotify := &pb.S2CKickoffPlayerNotify{
 			ErrorCode: errcode.Game_server_down_kickoff,
+			Error:     err.Error(),
 			Uid:       uint64(uid),
-			Reason:    fmt.Sprintf("gate deliver message to game server failed.route:%+v,err:%+v", message.Route, err),
+			Cid:       cid,
+			Seq:       message.Seq,
+			Route:     message.Route,
 		}
 		buffer, _ := p.link.ToBuffer(kickoffNotify, true)
 		message := &packet.Message{
