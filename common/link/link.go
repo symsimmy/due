@@ -964,6 +964,10 @@ func (l *Link) doNodeRPC(ctx context.Context, routeID int32, uid int64, fn func(
 	return reply, err
 }
 
+func (l *Link) ToBuffer(message interface{}, encrypt bool) ([]byte, error) {
+	return l.toBuffer(message, encrypt)
+}
+
 // 消息转buffer
 func (l *Link) toBuffer(message interface{}, encrypt bool) ([]byte, error) {
 	if message == nil {
