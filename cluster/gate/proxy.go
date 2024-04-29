@@ -100,7 +100,6 @@ func (p *Proxy) deliver(ctx context.Context, cid, uid int64, data []byte) {
 			ErrorCode: errcode.Game_server_down_kickoff,
 			Error:     err.Error(),
 			Uid:       uint64(uid),
-			Cid:       cid,
 			Seq:       message.Seq,
 			Route:     message.Route,
 		}
