@@ -413,8 +413,6 @@ func (c *serverConn) doWrite(buf []byte) (err error) {
 	if atomic.LoadInt32(&c.state) == int32(network.ConnClosed) {
 		return
 	}
-	start := time.Now()
 	_, err = c.conn.Write(buf)
-	prom.GateServerWriteDurationSummary.WithLabelValues(util.ToString(c.uid), util.ToString(c.id), "").Observe(float64(time.Since(start).Milliseconds()))
 	return
 }
