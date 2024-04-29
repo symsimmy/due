@@ -4,8 +4,11 @@ import (
 	"context"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/common/link"
+	"github.com/symsimmy/due/errcode"
 	"github.com/symsimmy/due/log"
 	"github.com/symsimmy/due/packet"
+	"github.com/symsimmy/due/pb"
+	"github.com/symsimmy/due/route"
 	"github.com/symsimmy/due/session"
 	"runtime"
 	"strings"
@@ -93,6 +96,25 @@ func (p *Proxy) deliver(ctx context.Context, cid, uid int64, data []byte) {
 	if err != nil {
 		log.Warnf("cid:[%+v], uid:[%+v] deliver message[route:%+v] failed: %v,send kickoff user message back to client", cid, uid, message.Route, err)
 		// 发送消息失败，往客户端推送一条kickoff的消息
+		kickoffNotify := &pb.S2CKickoffPlayerNotify{
+			ErrorCode: errcode.Game_server_down_kickoff,
+			Error:     err.Error(),
+			Uid:       uint64(uid),
+			Seq:       message.Seq,
+			Route:     message.Route,
+		}
+		buffer, _ := p.link.ToBuffer(kickoffNotify, true)
+		message := &packet.Message{
+			Seq:    0,
+			Route:  route.S2c_kick_off_player_notify,
+			Buffer: buffer,
+		}
+		data, _ := packet.Pack(message)
+
+		err := p.gate.session.Push(session.User, uid, data)
+		if err != nil {
+			log.Warnf("cid:[%+v], uid:[%+v] deliver message[route:%+v] failed, send kickoff user message back to client failed: %+v", cid, uid, message.Route, err)
+		}
 	} else {
 		// track gate to server
 

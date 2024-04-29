@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+message s2c_kickoff_player_notify {
+  int32 error_code = 1;
+  string error = 2;
+  uint64 uid = 3;
+  int32 seq = 4;
+  int32 route = 5;
+}
