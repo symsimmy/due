@@ -251,12 +251,12 @@ func (c *serverConn) read(conn gnet.Conn) error {
 		return ErrIncompletePacket
 	}
 
-	var bodyLen uint16
+	var bodyLen uint32
 	switch byteOrder() {
 	case binary.LittleEndian:
-		bodyLen = binary.LittleEndian.Uint16(buf[:msgLenBytes])
+		bodyLen = binary.LittleEndian.Uint32(buf[:msgLenBytes])
 	case binary.BigEndian:
-		bodyLen = binary.BigEndian.Uint16(buf[:msgLenBytes])
+		bodyLen = binary.BigEndian.Uint32(buf[:msgLenBytes])
 	}
 
 	msgLen := msgLenBytes + int(bodyLen)
