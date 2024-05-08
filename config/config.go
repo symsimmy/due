@@ -8,11 +8,12 @@ import (
 )
 
 const (
-	dueConfigArgName      = "config"
-	dueConfigEnvName      = "GO_ENV"
-	dueConfigDirEnvName   = "CONFIG_DIR"
-	defaultConfigPath     = "./configs"
-	defaultConfigFileName = "default"
+	dueConfigArgName              = "config"
+	dueConfigEnvName              = "GO_ENV"
+	dueConfigDirEnvName           = "CONFIG_DIR"
+	dueOverWriteConfigPathEnvName = "OVERWRITE_CONFIG"
+	defaultConfigPath             = "./configs"
+	defaultConfigFileName         = "default"
 
 	defaultRemoteConfigEnvName = "REMOTE_CONFIG"
 	defaultRemoteConfig        = "apollo"
@@ -38,10 +39,17 @@ func init() {
 		overwritePath = fmt.Sprintf("%v/%v.%v", configPath, localEnv, fileExtension)
 	}
 
+	// remote overwrite path from env
+	var remoteOverwritePath string
+	overwriteEnv := env.Get(dueOverWriteConfigPathEnvName).String()
+	if overwriteEnv != "" {
+		remoteOverwritePath = overwriteEnv
+	}
+
 	remoteEnv := env.Get(defaultRemoteConfigEnvName, defaultRemoteConfig).String()
 
 	// set local reader
-	SetReader(NewReader(WithSources(NewSource(path), NewSource(overwritePath)), WithRemoteSources(remoteEnv)))
+	SetReader(NewReader(WithSources(NewSource(path), NewSource(overwritePath), NewSource(remoteOverwritePath)), WithRemoteSources(remoteEnv)))
 
 	//InitConsulConfig(context.Background())
 }
