@@ -349,7 +349,9 @@ func (c *serverConn) write() {
 				if strings.Contains(err.Error(), "connection was aborted") {
 					break
 				}
-				//log.Errorf("connection:[%v] uid:[%v] write message error: %v", c.ID(), c.UID(), err)
+				log.Errorf("connection:[%v] uid:[%v] write message error: %v,data:%+v", c.ID(), c.UID(), err, buf)
+			} else {
+				log.Debugf("connection:[%v] uid:[%v] write message length:%+v,data:%+v", c.ID(), c.UID(), len(buf), buf)
 			}
 		case <-ticker.C:
 			deadline := xtime.Now().Add(-2 * c.connMgr.server.opts.heartbeatInterval).Unix()
