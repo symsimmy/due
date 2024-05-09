@@ -414,5 +414,8 @@ func (c *serverConn) doWrite(buf []byte) (err error) {
 		return
 	}
 	_, err = c.conn.Write(buf)
+	if err != nil {
+		log.Errorf("cid:%+v,uid:%+v doWrite error:%+v", c.ID(), c.UID(), err)
+	}
 	return
 }

@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	msgLenBytes  uint16 = 2        // 消息长度字节数
+	msgLenBytes  uint16 = 4        // 消息长度字节数
 	msgByteOrder string = "little" // 消息字节排序
 )
 
@@ -30,7 +30,7 @@ func pack(msg []byte) (packet []byte, err error) {
 	var buf bytes.Buffer
 	buf.Grow(len(msg) + int(msgLenBytes))
 
-	if err = binary.Write(&buf, byteOrder(), uint16(len(msg))); err != nil {
+	if err = binary.Write(&buf, byteOrder(), uint32(len(msg))); err != nil {
 		return
 	}
 
@@ -47,7 +47,7 @@ func pack(msg []byte) (packet []byte, err error) {
 func unpack(packet []byte) (msg []byte, err error) {
 	var (
 		buf    = bytes.NewBuffer(packet)
-		msgLen uint16
+		msgLen uint32
 	)
 
 	if err = binary.Read(buf, byteOrder(), &msgLen); err != nil {
@@ -78,7 +78,7 @@ func readMsgFromConn(reader *bufio.Reader, maxMsgLength int) (msg []byte, err er
 
 	var (
 		buf    = bytes.NewBuffer(packet)
-		msgLen uint16
+		msgLen uint32
 	)
 
 	if err = binary.Read(buf, byteOrder(), &msgLen); err != nil {
