@@ -347,7 +347,7 @@ func (c *serverConn) write() {
 			}
 
 			if err = c.doWrite(buf); err != nil {
-				log.Errorf("connection:[%v] uid:[%v] write message error: %v,data:%+v", c.ID(), c.UID(), err, data)
+				log.Errorf("connection:[%v] uid:[%v] write message error: %v,data:%+v", c.ID(), c.UID(), err, buf)
 				if strings.Contains(err.Error(), "connection was aborted") {
 					break
 				}
