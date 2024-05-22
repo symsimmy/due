@@ -6,6 +6,8 @@ import (
 )
 
 type Registry interface {
+	// GetMetaMap 获取meta
+	GetMetaMap() map[string]string
 	// Register 注册服务实例
 	Register(ctx context.Context, ins *ServiceInstance) error
 	// Deregister 解注册服务实例

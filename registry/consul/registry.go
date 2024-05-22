@@ -50,6 +50,10 @@ func NewRegistry(opts ...Option) *Registry {
 	return r
 }
 
+func (r *Registry) GetMetaMap() map[string]string {
+	return r.opts.metaMap
+}
+
 // Register 注册服务实例
 func (r *Registry) Register(ctx context.Context, ins *registry.ServiceInstance) error {
 	if r.err != nil {
