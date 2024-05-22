@@ -73,6 +73,8 @@ type options struct {
 	metricsEnable bool
 
 	failuresBeforeCritical int
+
+	metaMap map[string]string
 }
 
 func defaultOptions() *options {
@@ -133,4 +135,11 @@ func WithHeartbeatCheckInterval(interval int) Option {
 // WithDeregisterCriticalServiceAfter 设置健康检测失败后自动注销服务时间
 func WithDeregisterCriticalServiceAfter(after int) Option {
 	return func(o *options) { o.deregisterCriticalServiceAfter = after }
+}
+
+// WithMetaMap 设置metaMap
+func WithMetaMap(metaMap map[string]string) Option {
+	return func(o *options) {
+		o.metaMap = metaMap
+	}
 }

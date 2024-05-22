@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/consul/api"
-	"github.com/symsimmy/due/config"
 	"github.com/symsimmy/due/encoding/json"
 	"github.com/symsimmy/due/env"
 	"github.com/symsimmy/due/log"
 	"github.com/symsimmy/due/registry"
 	"net"
 	"net/url"
-	"os"
 	"strconv"
 	"time"
 )
@@ -22,25 +20,11 @@ const (
 	metaFieldKind     = "kind"
 	metaFieldAlias    = "alias"
 	metaFieldState    = "state"
-	metaFieldWanIp    = "wan"
-	metaFieldRegion   = "region"
-	metaFieldWsPort   = "wsPort"
-	metaFieldTcpPort  = "tcpPort"
 )
 
 const (
 	routeKvFormat = "route/%v/%v"
 	hostIpEnvName = "HOST_IP"
-	wanIpEnvName  = "WAN_IP"
-	regionEnvName = "REGION"
-)
-
-const (
-	wsPortConfigName  = "config.network.ws.server.addr"
-	tcpPortConfigName = "config.network.tcp.server.addr"
-
-	wanIpConfigName  = "config.wan.ip"
-	regionConfigName = "config.wan.region"
 )
 
 type registrar struct {
@@ -80,20 +64,7 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 		return err
 	}
 
-	wanIpConfig := config.Get(wanIpConfigName).String()
-	regionConfig := config.Get(regionConfigName).String()
-	if len(wanIpConfig) != 0 {
-		os.Setenv(wanIpEnvName, wanIpConfig)
-	}
-	if len(regionConfig) != 0 {
-		os.Setenv(regionEnvName, regionConfig)
-	}
-
 	overwriteHost := env.Get(hostIpEnvName, host).String()
-	wanIp := env.Get(wanIpEnvName).String()
-	region := env.Get(regionEnvName).String()
-	wsPort := config.Get(wsPortConfigName).String()
-	tcpPort := config.Get(tcpPortConfigName).String()
 
 	registration := &api.AgentServiceRegistration{
 		ID:      ins.ID,
@@ -111,17 +82,8 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 	registration.Meta[metaFieldKind] = string(ins.Kind)
 	registration.Meta[metaFieldAlias] = ins.Alias
 	registration.Meta[metaFieldState] = string(ins.State)
-	if wanIp != "" {
-		registration.Meta[metaFieldWanIp] = wanIp
-	}
-	if region != "" {
-		registration.Meta[metaFieldRegion] = region
-	}
-	if len(wsPort) != 0 {
-		registration.Meta[metaFieldWsPort] = wsPort
-	}
-	if len(tcpPort) != 0 {
-		registration.Meta[metaFieldTcpPort] = tcpPort
+	for key, value := range ins.MetaMap {
+		registration.Meta[key] = value
 	}
 
 	for _, event := range ins.Events {

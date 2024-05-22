@@ -286,6 +286,7 @@ func (g *Gate) registerServiceInstance() {
 		Alias:    g.opts.name,
 		State:    cluster.Work,
 		Endpoint: g.rpc.Endpoint().String(),
+		MetaMap:  g.opts.registry.GetMetaMap(),
 	}
 	if g.opts.promServer.Enable() {
 		metricsPort, err := strconv.Atoi(g.opts.promServer.GetMetricsPort())
