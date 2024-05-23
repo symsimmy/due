@@ -232,6 +232,7 @@ func (n *Node) registerServiceInstance() {
 		Routes:   routes,
 		Events:   events,
 		Endpoint: n.rpc.Endpoint().String(),
+		MetaMap:  n.opts.registry.GetMetaMap(),
 	}
 	if n.opts.promServer.Enable() {
 		metricsPort, err := strconv.Atoi(n.opts.promServer.GetMetricsPort())
