@@ -283,6 +283,22 @@ func (n *Node) setState(state cluster.State) {
 	return
 }
 
+func (n *Node) addMetaMap(key string, value string) {
+	if n.instance != nil {
+		n.instance.MetaMap[key] = value
+		for i := 0; i < 3; i++ {
+			ctx, cancel := context.WithTimeout(n.ctx, 10*time.Second)
+			err := n.opts.registry.Register(ctx, n.instance)
+			cancel()
+			if err == nil {
+				break
+			}
+		}
+	}
+
+	return
+}
+
 // 获取节点状态
 func (n *Node) getState() cluster.State {
 	if state := (*cluster.State)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&n.state)))); state == nil {

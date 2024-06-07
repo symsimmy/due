@@ -343,6 +343,22 @@ func (g *Gate) setState(state cluster.State) {
 	return
 }
 
+func (g *Gate) addMetaMap(key string, value string) {
+	if g.instance != nil {
+		g.instance.MetaMap[key] = value
+		for i := 0; i < 3; i++ {
+			ctx, cancel := context.WithTimeout(g.ctx, 10*time.Second)
+			err := g.opts.registry.Register(ctx, g.instance)
+			cancel()
+			if err == nil {
+				break
+			}
+		}
+	}
+
+	return
+}
+
 // 获取节点状态
 func (g *Gate) getState() cluster.State {
 	if state := (*cluster.State)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&g.state)))); state == nil {

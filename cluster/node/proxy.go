@@ -72,6 +72,10 @@ func (p *Proxy) SetNodeState(state cluster.State) {
 	p.node.setState(state)
 }
 
+func (p *Proxy) AddMetaMap(key string, value string) {
+	p.node.addMetaMap(key, value)
+}
+
 // Router 路由器
 func (p *Proxy) Router() *Router {
 	return p.node.router
