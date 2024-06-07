@@ -171,6 +171,10 @@ func (p *Proxy) SetNodeState(state cluster.State) {
 	p.gate.setState(state)
 }
 
+func (p *Proxy) AddMetaMap(key string, value string) {
+	p.gate.addMetaMap(key, value)
+}
+
 // Stat 统计会话总数
 func (p *Proxy) Stat(ctx context.Context, kind session.Kind) (int64, error) {
 	return p.link.Stat(ctx, kind)
