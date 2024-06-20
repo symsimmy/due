@@ -34,6 +34,7 @@ func newProxy(master *Master) *Proxy {
 		Registry:    master.opts.registry,
 		Encryptor:   master.opts.encryptor,
 		Transporter: master.opts.transporter,
+		Namespace:   master.opts.namespace,
 	})}
 }
 

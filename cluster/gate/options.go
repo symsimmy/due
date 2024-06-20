@@ -29,6 +29,7 @@ const (
 	defaultTimeout      = 30 * time.Second // 默认超时时间
 	defaultCodec        = "proto"          // 默认编解码器名称
 	defaultWorkloadStat = 500
+	defaultNamespace    = ""
 )
 
 const (
@@ -39,6 +40,7 @@ const (
 	defaultDecryptorKey    = "config.cluster.gate.decryptor"
 	defaultEncryptorKey    = "config.cluster.node.encryptor"
 	defaultWorkloadStatKey = "config.workload.stat"
+	defaultNamespaceKey    = "config.cluster.gate.namespace"
 )
 
 type Option func(o *options)
@@ -60,6 +62,7 @@ type options struct {
 	encryptor    crypto.Encryptor   // 消息加密器
 	decryptor    crypto.Decryptor
 	workloadStat int32
+	namespace    string
 }
 
 func defaultOptions() *options {
@@ -69,6 +72,7 @@ func defaultOptions() *options {
 		timeout:      defaultTimeout,
 		codec:        encoding.Invoke(defaultCodec),
 		workloadStat: config.Get(defaultWorkloadStatKey, defaultWorkloadStat).Int32(),
+		namespace:    config.Get(defaultNamespaceKey, defaultNamespace).String(),
 	}
 
 	if id := config.Get(defaultIDKey).String(); id != "" {

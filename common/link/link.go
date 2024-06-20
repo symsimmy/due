@@ -2,6 +2,7 @@ package link
 
 import (
 	"context"
+	"fmt"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/common/dispatcher"
 	"github.com/symsimmy/due/common/endpoint"
@@ -50,6 +51,7 @@ type Options struct {
 	Encryptor       crypto.Encryptor           // 加密器
 	Transporter     transport.Transporter      // 传输器
 	BalanceStrategy dispatcher.BalanceStrategy // 负载均衡策略
+	Namespace       string
 }
 
 func NewLink(opts *Options) *Link {
@@ -251,7 +253,7 @@ func (l *Link) FetchServiceAliasIDs(ctx context.Context, kind cluster.Kind, alia
 }
 
 func (l *Link) FetchServiceAliasList(ctx context.Context, kind cluster.Kind, alias string, states ...cluster.State) ([]*registry.ServiceInstance, error) {
-	services, err := l.opts.Registry.Services(ctx, string(kind))
+	services, err := l.opts.Registry.Services(ctx, fmt.Sprintf("%s%s", l.opts.Namespace, string(kind)))
 	if err != nil {
 		return nil, err
 	}

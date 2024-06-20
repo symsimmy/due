@@ -14,9 +14,10 @@ import (
 )
 
 const (
-	defaultName    = "master"        // 默认节点名称
-	defaultCodec   = "proto"         // 默认编解码器名称
-	defaultTimeout = 3 * time.Second // 默认超时时间
+	defaultName      = "master"        // 默认节点名称
+	defaultCodec     = "proto"         // 默认编解码器名称
+	defaultTimeout   = 3 * time.Second // 默认超时时间
+	defaultNamespace = ""
 )
 
 const (
@@ -26,6 +27,7 @@ const (
 	defaultTimeoutKey   = "config.cluster.master.timeout"
 	defaultEncryptorKey = "config.cluster.master.encryptor"
 	defaultDecryptorKey = "config.cluster.master.decryptor"
+	defaultNamespaceKey = "config.cluster.master.namespace"
 )
 
 type Option func(o *options)
@@ -42,13 +44,15 @@ type options struct {
 	catServer   *cat.Server
 	encryptor   crypto.Encryptor // 消息加密器
 	decryptor   crypto.Decryptor // 消息解密器
+	namespace   string
 }
 
 func defaultOptions() *options {
 	opts := &options{
-		ctx:     context.Background(),
-		name:    defaultName,
-		timeout: defaultTimeout,
+		ctx:       context.Background(),
+		name:      defaultName,
+		timeout:   defaultTimeout,
+		namespace: config.Get(defaultNamespaceKey, defaultNamespace).String(),
 	}
 
 	if id := config.Get(defaultIDKey).String(); id != "" {

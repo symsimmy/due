@@ -280,13 +280,14 @@ func (g *Gate) stopCatServer() {
 // 注册服务实例
 func (g *Gate) registerServiceInstance() {
 	g.instance = &registry.ServiceInstance{
-		ID:       g.opts.id,
-		Name:     string(cluster.Gate),
-		Kind:     cluster.Gate,
-		Alias:    g.opts.name,
-		State:    cluster.Work,
-		Endpoint: g.rpc.Endpoint().String(),
-		MetaMap:  g.opts.registry.GetMetaMap(),
+		ID:        g.opts.id,
+		Name:      string(cluster.Gate),
+		Kind:      cluster.Gate,
+		Alias:     g.opts.name,
+		State:     cluster.Work,
+		Endpoint:  g.rpc.Endpoint().String(),
+		MetaMap:   g.opts.registry.GetMetaMap(),
+		Namespace: g.opts.namespace,
 	}
 	if g.opts.promServer.Enable() {
 		metricsPort, err := strconv.Atoi(g.opts.promServer.GetMetricsPort())

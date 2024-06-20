@@ -20,6 +20,7 @@ const (
 	defaultTimeout                 = 3 * time.Second // 默认超时时间
 	defaultEnableAsyncEventHandle  = true            // event事件异步执行
 	defaultEnableAsyncRouterHandle = true            // route事件异步执行
+	defaultNamespace               = ""
 )
 
 const (
@@ -31,6 +32,7 @@ const (
 	defaultDecryptorKey         = "config.cluster.node.decryptor"
 	defaultAsyncEventHandleKey  = "config.cluster.node.async_event_handle"
 	defaultAsyncRouterHandleKey = "config.cluster.node.async_router_handle"
+	defaultNamespaceKey         = "config.cluster.node.namespace"
 )
 
 type Option func(o *options)
@@ -50,14 +52,16 @@ type options struct {
 	decryptor         crypto.Decryptor      // 消息解密器
 	asyncEventHandle  bool                  // 异步处理连接事件
 	asyncRouterHandle bool                  // 异步处理消息事件
+	namespace         string
 }
 
 func defaultOptions() *options {
 	opts := &options{
-		ctx:     context.Background(),
-		name:    defaultName,
-		codec:   encoding.Invoke(defaultCodec),
-		timeout: defaultTimeout,
+		ctx:       context.Background(),
+		name:      defaultName,
+		codec:     encoding.Invoke(defaultCodec),
+		timeout:   defaultTimeout,
+		namespace: config.Get(defaultNamespaceKey, defaultNamespace).String(),
 	}
 
 	if id := config.Get(defaultIDKey).String(); id != "" {

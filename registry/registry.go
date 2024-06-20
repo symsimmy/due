@@ -52,7 +52,8 @@ type ServiceInstance struct {
 	MetaMap  map[string]string `json:"metaMap"`
 	// prometheus enable
 	// prometheus metrics暴露端口
-	MetricsPort int `json:"metricsPort"`
+	MetricsPort int    `json:"metricsPort"`
+	Namespace   string `json:"namespace"`
 }
 
 type Route struct {

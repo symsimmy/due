@@ -38,6 +38,7 @@ func newProxy(gate *Gate) *Proxy {
 		Transporter: gate.opts.transporter,
 		Codec:       gate.opts.codec,
 		Encryptor:   gate.opts.encryptor,
+		Namespace:   gate.opts.namespace,
 	})}
 }
 
