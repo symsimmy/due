@@ -49,6 +49,7 @@ func newProxy(node *Node) *Proxy {
 		Registry:    node.opts.registry,
 		Encryptor:   node.opts.encryptor,
 		Transporter: node.opts.transporter,
+		Namespace:   node.opts.namespace,
 	})}
 }
 

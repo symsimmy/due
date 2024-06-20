@@ -68,7 +68,7 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 
 	registration := &api.AgentServiceRegistration{
 		ID:      ins.ID,
-		Name:    ins.Name,
+		Name:    fmt.Sprintf("%s%s", ins.Namespace, ins.Name),
 		Tags:    make([]string, 0, len(ins.Events)),
 		Meta:    make(map[string]string, 3),
 		Address: overwriteHost,
@@ -137,7 +137,7 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 		metricsInsId := ins.ID + "-exporter"
 		metricsRegistration := &api.AgentServiceRegistration{
 			ID:      metricsInsId,
-			Name:    ins.Name + "-exporter",
+			Name:    fmt.Sprintf("%s%s-exporter", ins.Namespace, ins.Name),
 			Address: overwriteHost,
 			Port:    ins.MetricsPort,
 			TaggedAddresses: map[string]api.ServiceAddress{raw.Scheme: {

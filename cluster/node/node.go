@@ -224,15 +224,16 @@ func (n *Node) registerServiceInstance() {
 	}
 
 	n.instance = &registry.ServiceInstance{
-		ID:       n.opts.id,
-		Name:     string(cluster.Node),
-		Kind:     cluster.Node,
-		Alias:    n.opts.name,
-		State:    n.getState(),
-		Routes:   routes,
-		Events:   events,
-		Endpoint: n.rpc.Endpoint().String(),
-		MetaMap:  n.opts.registry.GetMetaMap(),
+		ID:        n.opts.id,
+		Name:      string(cluster.Node),
+		Kind:      cluster.Node,
+		Alias:     n.opts.name,
+		State:     n.getState(),
+		Routes:    routes,
+		Events:    events,
+		Endpoint:  n.rpc.Endpoint().String(),
+		MetaMap:   n.opts.registry.GetMetaMap(),
+		Namespace: n.opts.namespace,
 	}
 	if n.opts.promServer.Enable() {
 		metricsPort, err := strconv.Atoi(n.opts.promServer.GetMetricsPort())

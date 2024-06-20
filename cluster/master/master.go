@@ -3,6 +3,8 @@ package master
 import (
 	"context"
 	"github.com/symsimmy/due/cluster"
+	"github.com/symsimmy/due/common/endpoint"
+	xnet "github.com/symsimmy/due/common/net"
 	"github.com/symsimmy/due/component"
 	"github.com/symsimmy/due/config"
 	_ "github.com/symsimmy/due/crypto/ecc"
@@ -10,8 +12,6 @@ import (
 	_ "github.com/symsimmy/due/encoding/json"
 	_ "github.com/symsimmy/due/encoding/proto"
 	_ "github.com/symsimmy/due/encoding/xml"
-	"github.com/symsimmy/due/common/endpoint"
-	xnet "github.com/symsimmy/due/common/net"
 	"github.com/symsimmy/due/log"
 	"github.com/symsimmy/due/registry"
 	"sync/atomic"
@@ -119,12 +119,13 @@ func (m *Master) registerServiceInstance() {
 	m.endpoint = endpoint.NewEndpoint("http", exposeAddr, false)
 
 	m.instance = &registry.ServiceInstance{
-		ID:       m.opts.id,
-		Name:     string(cluster.Master),
-		Kind:     cluster.Node,
-		Alias:    m.opts.name,
-		State:    m.getState(),
-		Endpoint: m.endpoint.String(),
+		ID:        m.opts.id,
+		Name:      string(cluster.Master),
+		Kind:      cluster.Node,
+		Alias:     m.opts.name,
+		State:     m.getState(),
+		Endpoint:  m.endpoint.String(),
+		Namespace: m.opts.namespace,
 	}
 
 	ctx, cancel := context.WithTimeout(m.ctx, 10*time.Second)
