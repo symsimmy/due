@@ -68,7 +68,7 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 
 	registration := &api.AgentServiceRegistration{
 		ID:      ins.ID,
-		Name:    fmt.Sprintf("%s%s", ins.Namespace, ins.Name),
+		Name:    ins.Name,
 		Tags:    make([]string, 0, len(ins.Events)),
 		Meta:    make(map[string]string, 3),
 		Address: overwriteHost,

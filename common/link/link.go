@@ -2,7 +2,6 @@ package link
 
 import (
 	"context"
-	"fmt"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/common/dispatcher"
 	"github.com/symsimmy/due/common/endpoint"
@@ -253,7 +252,7 @@ func (l *Link) FetchServiceAliasIDs(ctx context.Context, kind cluster.Kind, alia
 }
 
 func (l *Link) FetchServiceAliasList(ctx context.Context, kind cluster.Kind, alias string, states ...cluster.State) ([]*registry.ServiceInstance, error) {
-	services, err := l.opts.Registry.Services(ctx, fmt.Sprintf("%s%s", l.opts.Namespace, string(kind)))
+	services, err := l.opts.Registry.Services(ctx, l.opts.Namespace, kind, alias)
 	if err != nil {
 		return nil, err
 	}
@@ -1023,14 +1022,19 @@ func (l *Link) getNodeClientByNID(nid string) (transport.NodeClient, error) {
 // WatchServiceInstance 监听服务实例
 func (l *Link) WatchServiceInstance(ctx context.Context, kinds ...cluster.Kind) {
 	for _, kind := range kinds {
-		l.watchServiceInstance(ctx, kind)
+		if kind == cluster.Node {
+			l.watchServiceInstance(ctx, kind, "center")
+			l.watchServiceInstance(ctx, kind, "game")
+		} else {
+			l.watchServiceInstance(ctx, kind, "")
+		}
 	}
 }
 
 // 监听服务实例
-func (l *Link) watchServiceInstance(ctx context.Context, kind cluster.Kind) {
+func (l *Link) watchServiceInstance(ctx context.Context, kind cluster.Kind, alias string) {
 	rctx, rcancel := context.WithTimeout(ctx, 10*time.Second)
-	watcher, err := l.opts.Registry.Watch(rctx, string(kind))
+	watcher, err := l.opts.Registry.Watch(rctx, l.opts.Namespace, kind, alias)
 	rcancel()
 	if err != nil {
 		log.Fatalf("the dispatcher instance watch failed: %v", err)
@@ -1049,7 +1053,6 @@ func (l *Link) watchServiceInstance(ctx context.Context, kind cluster.Kind) {
 			if err != nil {
 				continue
 			}
-
 			if kind == cluster.Node {
 				l.nodeDispatcher.ReplaceServices(services...)
 			} else {

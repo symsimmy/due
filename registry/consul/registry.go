@@ -87,7 +87,8 @@ func (r *Registry) Deregister(ctx context.Context, ins *registry.ServiceInstance
 }
 
 // Services 获取服务实例列表
-func (r *Registry) Services(ctx context.Context, serviceName string) ([]*registry.ServiceInstance, error) {
+func (r *Registry) Services(ctx context.Context, namespace string, kind cluster.Kind, alias string) ([]*registry.ServiceInstance, error) {
+	serviceName := r.getServicesName(namespace, kind, alias)
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -102,7 +103,8 @@ func (r *Registry) Services(ctx context.Context, serviceName string) ([]*registr
 }
 
 // Watch 监听服务
-func (r *Registry) Watch(ctx context.Context, serviceName string) (registry.Watcher, error) {
+func (r *Registry) Watch(ctx context.Context, namespace string, kind cluster.Kind, alias string) (registry.Watcher, error) {
+	serviceName := r.getServicesName(namespace, kind, alias)
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -119,6 +121,14 @@ func (r *Registry) Watch(ctx context.Context, serviceName string) (registry.Watc
 	r.watchers.Store(serviceName, w)
 
 	return w.fork(), nil
+}
+
+func (r *Registry) getServicesName(namespace string, kind cluster.Kind, alias string) string {
+	if alias == "" {
+		return fmt.Sprintf("%s%s", namespace, string(kind))
+	} else {
+		return fmt.Sprintf("%s%s.%s", namespace, string(kind), alias)
+	}
 }
 
 // 获取服务实体列表

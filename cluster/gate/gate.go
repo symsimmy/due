@@ -9,6 +9,7 @@ package gate
 
 import (
 	"context"
+	"fmt"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/common/link"
 	"github.com/symsimmy/due/errors"
@@ -281,7 +282,7 @@ func (g *Gate) stopCatServer() {
 func (g *Gate) registerServiceInstance() {
 	g.instance = &registry.ServiceInstance{
 		ID:        g.opts.id,
-		Name:      string(cluster.Gate),
+		Name:      fmt.Sprintf("%s%s", g.opts.namespace, string(cluster.Gate)),
 		Kind:      cluster.Gate,
 		Alias:     g.opts.name,
 		State:     cluster.Work,

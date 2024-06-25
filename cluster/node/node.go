@@ -2,6 +2,7 @@ package node
 
 import (
 	"context"
+	"fmt"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/component"
 	"github.com/symsimmy/due/log"
@@ -223,9 +224,15 @@ func (n *Node) registerServiceInstance() {
 		events = append(events, event)
 	}
 
+	var name string
+	if n.opts.namespace != "" {
+		name = fmt.Sprintf("%s%s.%s", n.opts.namespace, string(cluster.Node), n.opts.name)
+	} else {
+		name = string(cluster.Node)
+	}
 	n.instance = &registry.ServiceInstance{
 		ID:        n.opts.id,
-		Name:      string(cluster.Node),
+		Name:      name,
 		Kind:      cluster.Node,
 		Alias:     n.opts.name,
 		State:     n.getState(),
