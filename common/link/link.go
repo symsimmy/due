@@ -1023,18 +1023,18 @@ func (l *Link) getNodeClientByNID(nid string) (transport.NodeClient, error) {
 func (l *Link) WatchServiceInstance(ctx context.Context, kinds ...cluster.Kind) {
 	for _, kind := range kinds {
 		if kind == cluster.Node {
-			l.watchNodeServiceInstance(ctx, "center")
-			l.watchNodeServiceInstance(ctx, "game")
+			l.watchServiceInstance(ctx, kind, "center")
+			l.watchServiceInstance(ctx, kind, "game")
 		} else {
-			l.watchServiceInstance(ctx, kind)
+			l.watchServiceInstance(ctx, kind, "")
 		}
 	}
 }
 
 // 监听服务实例
-func (l *Link) watchServiceInstance(ctx context.Context, kind cluster.Kind) {
+func (l *Link) watchServiceInstance(ctx context.Context, kind cluster.Kind, alias string) {
 	rctx, rcancel := context.WithTimeout(ctx, 10*time.Second)
-	watcher, err := l.opts.Registry.Watch(rctx, l.opts.Namespace, kind, "")
+	watcher, err := l.opts.Registry.Watch(rctx, l.opts.Namespace, kind, alias)
 	rcancel()
 	if err != nil {
 		log.Fatalf("the dispatcher instance watch failed: %v", err)
@@ -1053,35 +1053,11 @@ func (l *Link) watchServiceInstance(ctx context.Context, kind cluster.Kind) {
 			if err != nil {
 				continue
 			}
-
-			l.gateDispatcher.ReplaceServices(services...)
-		}
-	}()
-}
-
-func (l *Link) watchNodeServiceInstance(ctx context.Context, alias string) {
-	rctx, rcancel := context.WithTimeout(ctx, 10*time.Second)
-	watcher, err := l.opts.Registry.Watch(rctx, l.opts.Namespace, "node", alias)
-	rcancel()
-	if err != nil {
-		log.Fatalf("the dispatcher instance watch failed: %v", err)
-	}
-
-	go func() {
-		defer watcher.Stop()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				// exec watch
+			if kind == cluster.Node {
+				l.nodeDispatcher.ReplaceServices(services...)
+			} else {
+				l.gateDispatcher.ReplaceServices(services...)
 			}
-			services, err := watcher.Next()
-			if err != nil {
-				continue
-			}
-
-			l.nodeDispatcher.ReplaceServices(services...)
 		}
 	}()
 }
