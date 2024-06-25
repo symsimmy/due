@@ -125,6 +125,9 @@ func (r *Registry) Watch(ctx context.Context, namespace string, kind cluster.Kin
 
 func (r *Registry) getServicesName(namespace string, kind cluster.Kind, alias string) string {
 	if kind == cluster.Node {
+		if namespace == "" {
+			return string(kind)
+		}
 		return fmt.Sprintf("%s%s.%s", namespace, string(kind), alias)
 	} else {
 		return fmt.Sprintf("%s%s", namespace, string(kind))
