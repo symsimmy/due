@@ -2,6 +2,7 @@ package master
 
 import (
 	"context"
+	"fmt"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/common/endpoint"
 	xnet "github.com/symsimmy/due/common/net"
@@ -120,7 +121,7 @@ func (m *Master) registerServiceInstance() {
 
 	m.instance = &registry.ServiceInstance{
 		ID:        m.opts.id,
-		Name:      string(cluster.Master),
+		Name:      fmt.Sprintf("%s%s", m.opts.namespace, string(cluster.Master)),
 		Kind:      cluster.Node,
 		Alias:     m.opts.name,
 		State:     m.getState(),
