@@ -224,15 +224,9 @@ func (n *Node) registerServiceInstance() {
 		events = append(events, event)
 	}
 
-	var name string
-	if n.opts.namespace != "" {
-		name = fmt.Sprintf("%s%s.%s", n.opts.namespace, string(cluster.Node), n.opts.name)
-	} else {
-		name = string(cluster.Node)
-	}
 	n.instance = &registry.ServiceInstance{
 		ID:        n.opts.id,
-		Name:      name,
+		Name:      fmt.Sprintf("%s%s", n.opts.namespace, string(cluster.Node)),
 		Kind:      cluster.Node,
 		Alias:     n.opts.name,
 		State:     n.getState(),
