@@ -13,16 +13,16 @@ type Registry interface {
 	// Deregister 解注册服务实例
 	Deregister(ctx context.Context, ins *ServiceInstance) error
 	// Watch 监听相同服务名的服务实例变化
-	Watch(ctx context.Context, namespace string, kind cluster.Kind, alias string) (Watcher, error)
+	Watch(ctx context.Context, serviceName string) (Watcher, error)
 	// Services 获取服务实例列表
-	Services(ctx context.Context, namespace string, kind cluster.Kind, alias string) ([]*ServiceInstance, error)
+	Services(ctx context.Context, serviceName string) ([]*ServiceInstance, error)
 }
 
 type Discovery interface {
 	// Watch 监听相同服务名的服务实例变化
-	Watch(ctx context.Context, namespace string, kind cluster.Kind, alias string) (Watcher, error)
+	Watch(ctx context.Context, serviceName string) (Watcher, error)
 	// Services 获取服务实例列表
-	Services(ctx context.Context, namespace string, kind cluster.Kind, alias string) ([]*ServiceInstance, error)
+	Services(ctx context.Context, serviceName string) ([]*ServiceInstance, error)
 }
 
 type Watcher interface {
