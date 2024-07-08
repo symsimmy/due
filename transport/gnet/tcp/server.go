@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/panjf2000/gnet/v2"
-	"github.com/symsimmy/due/errors"
 	"github.com/symsimmy/due/common/endpoint"
+	"github.com/symsimmy/due/errors"
 	"github.com/symsimmy/due/log"
 	"github.com/symsimmy/due/transport"
 )
@@ -64,7 +64,7 @@ func (s *Server) OnTraffic(c gnet.Conn) (action gnet.Action) {
 			return gnet.Close
 		}
 		// 收到 ping 包
-		if len(data.Data) <= 0 {
+		if len(data.Data) <= 0 && data.Route == 0 {
 			break
 		}
 		v, err := s.receiveHandler(data.Route, data.Data)
