@@ -5,11 +5,13 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/symsimmy/due/errcode"
 	"github.com/symsimmy/due/log"
+	"github.com/symsimmy/due/metrics/prometheus"
 	"github.com/symsimmy/due/packet"
 	"github.com/symsimmy/due/session"
 	"github.com/symsimmy/due/transport"
 	"github.com/symsimmy/due/transport/gnet/internal/pb"
 	"github.com/symsimmy/due/transport/gnet/internal/server"
+	"github.com/symsimmy/due/utils/xconv"
 )
 
 type endpoint struct {
@@ -172,6 +174,9 @@ func (e *endpoint) dispatch(methodName uint16, data []byte) (reply interface{}, 
 			Buffer: req.Message.Buffer,
 		})
 
+		// track server to gate
+		prometheus.GateServerReceiveFromServerMessageCountCounter.WithLabelValues(xconv.String(req.Message.Route), xconv.String(req.Target)).Inc()
+
 		if err != nil {
 			return nil, err
 		}
@@ -189,6 +194,9 @@ func (e *endpoint) dispatch(methodName uint16, data []byte) (reply interface{}, 
 			Buffer: req.Message.Buffer,
 		})
 
+		// track server to gate
+		prometheus.GateServerReceiveFromServerMessageCountCounter.WithLabelValues(xconv.String(req.Message.Route), xconv.String(req.Targets)).Inc()
+
 		if err != nil {
 			return nil, err
 		}
@@ -205,6 +213,9 @@ func (e *endpoint) dispatch(methodName uint16, data []byte) (reply interface{}, 
 			Route:  req.Message.Route,
 			Buffer: req.Message.Buffer,
 		})
+
+		// track server to gate
+		prometheus.GateServerReceiveFromServerMessageCountCounter.WithLabelValues(xconv.String(req.Message.Route), "").Inc()
 
 		if err != nil {
 			return nil, err

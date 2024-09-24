@@ -6,10 +6,12 @@ import (
 	"github.com/symsimmy/due/common/link"
 	"github.com/symsimmy/due/errcode"
 	"github.com/symsimmy/due/log"
+	"github.com/symsimmy/due/metrics/prometheus"
 	"github.com/symsimmy/due/packet"
 	"github.com/symsimmy/due/pb"
 	"github.com/symsimmy/due/route"
 	"github.com/symsimmy/due/session"
+	"github.com/symsimmy/due/utils/xconv"
 	"runtime"
 	"strings"
 )
@@ -83,6 +85,12 @@ func (p *Proxy) deliver(ctx context.Context, cid, uid int64, data []byte) {
 		return
 	}
 
+	// track 收到client消息数量
+	prometheus.GateServerReceiveClientMessageCountCounter.WithLabelValues(p.GetServerIP(), p.GetServerPort(), xconv.String(message.Route)).Inc()
+
+	// track 收到client消息大小
+	prometheus.GateServerReceiveClientMessageBytesGauge.WithLabelValues(p.GetServerIP(), p.GetServerPort(), xconv.String(message.Route)).Set(float64(len(data)))
+
 	if len(p.gate.opts.receiveHook) > 0 {
 		for _, f := range p.gate.opts.receiveHook {
 			f(ctx, cid, uid, message)
@@ -95,6 +103,8 @@ func (p *Proxy) deliver(ctx context.Context, cid, uid int64, data []byte) {
 		Message: message,
 	})
 	if err != nil {
+		// track gate to server succeed
+		prometheus.GateServerSendToServerMessageCountCounter.WithLabelValues(xconv.String(message.Route), xconv.String(errcode.Game_server_down_kickoff)).Inc()
 		log.Warnf("cid:[%+v], uid:[%+v] deliver message[route:%+v] failed: %v,send kickoff user message back to client", cid, uid, message.Route, err)
 		// 发送消息失败，往客户端推送一条kickoff的消息
 		kickoffNotify := &pb.S2CKickoffPlayerNotify{
@@ -117,8 +127,8 @@ func (p *Proxy) deliver(ctx context.Context, cid, uid int64, data []byte) {
 			log.Warnf("cid:[%+v], uid:[%+v] deliver message[route:%+v] failed, send kickoff user message back to client failed: %+v", cid, uid, message.Route, err)
 		}
 	} else {
-		// track gate to server
-
+		// track gate to server succeed
+		prometheus.GateServerSendToServerMessageCountCounter.WithLabelValues(xconv.String(message.Route), xconv.String(errcode.Succeed)).Inc()
 	}
 }
 

@@ -3,12 +3,14 @@ package gate
 import (
 	"context"
 	"github.com/symsimmy/due/log"
+	"github.com/symsimmy/due/metrics/prometheus"
 	"github.com/symsimmy/due/packet"
 	"github.com/symsimmy/due/session"
 	"github.com/symsimmy/due/transport"
 	"github.com/symsimmy/due/transport/grpc/code"
 	"github.com/symsimmy/due/transport/grpc/internal/pb"
 	"github.com/symsimmy/due/transport/grpc/internal/server"
+	"github.com/symsimmy/due/utils/xconv"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
@@ -138,6 +140,9 @@ func (e *endpoint) Push(stream pb.Gate_PushServer) error {
 			return err
 		}
 
+		// track server to gate
+		prometheus.GateServerReceiveFromServerMessageCountCounter.WithLabelValues(xconv.String(req.Message.Route), xconv.String(req.Target)).Inc()
+
 		e.pushCh <- req
 	}
 }
@@ -172,6 +177,9 @@ func (e *endpoint) Multicast(stream pb.Gate_MulticastServer) error {
 			return err
 		}
 
+		// track server to gate
+		prometheus.GateServerReceiveFromServerMessageCountCounter.WithLabelValues(xconv.String(req.Message.Route), xconv.String(req.Targets)).Inc()
+
 		e.multicastCh <- req
 	}
 }
@@ -205,6 +213,9 @@ func (e *endpoint) Broadcast(stream pb.Gate_BroadcastServer) error {
 			log.Errorf("gate server receive broadcast message failed.err:%v", err)
 			return err
 		}
+
+		// track server to gate
+		prometheus.GateServerReceiveFromServerMessageCountCounter.WithLabelValues(xconv.String(req.Message.Route), "").Inc()
 
 		e.broadcastCh <- req
 	}

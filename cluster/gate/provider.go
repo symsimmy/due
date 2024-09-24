@@ -4,8 +4,10 @@ import (
 	"context"
 	"github.com/symsimmy/due/cluster"
 	"github.com/symsimmy/due/log"
+	"github.com/symsimmy/due/metrics/prometheus"
 	"github.com/symsimmy/due/packet"
 	"github.com/symsimmy/due/session"
+	"github.com/symsimmy/due/utils/xconv"
 	"strconv"
 	"strings"
 )
@@ -98,6 +100,12 @@ func (p *provider) Push(ctx context.Context, kind session.Kind, target int64, me
 		len(message.Buffer),
 	)
 
+	// track 发送client消息数量
+	prometheus.GateServerSendToClientMessageCountCounter.WithLabelValues(p.gate.proxy.GetServerIP(), p.gate.proxy.GetServerPort(), xconv.String(message.Route)).Inc()
+
+	// track 发送client消息大小
+	prometheus.GateServerSendToClientMessageBytesGauge.WithLabelValues(p.gate.proxy.GetServerIP(), p.gate.proxy.GetServerPort(), xconv.String(message.Route)).Set(float64(len(message.Buffer)))
+
 	err = p.gate.session.Push(kind, target, msg)
 	if kind == session.User && err == session.ErrNotFoundSession {
 		err = p.gate.opts.locator.Rem(ctx, target, cluster.Gate, p.gate.opts.id)
@@ -138,6 +146,13 @@ func (p *provider) Multicast(ctx context.Context, kind session.Kind, targets []i
 	}
 
 	n, err := p.gate.session.Multicast(kind, targets, msg)
+
+	// track 发送client消息数量
+	prometheus.GateServerSendToClientMessageCountCounter.WithLabelValues(p.gate.proxy.GetServerIP(), p.gate.proxy.GetServerPort(), xconv.String(message.Route)).Inc()
+
+	// track 发送client消息大小
+	prometheus.GateServerSendToClientMessageBytesGauge.WithLabelValues(p.gate.proxy.GetServerIP(), p.gate.proxy.GetServerPort(), xconv.String(message.Route)).Set(float64(len(message.Buffer)))
+
 	return n, err
 }
 
@@ -157,6 +172,13 @@ func (p *provider) Broadcast(ctx context.Context, kind session.Kind, message *pa
 	//}
 
 	n, err := p.gate.session.Broadcast(kind, msg)
+
+	// track 发送client消息数量
+	prometheus.GateServerSendToClientMessageCountCounter.WithLabelValues(p.gate.proxy.GetServerIP(), p.gate.proxy.GetServerPort(), xconv.String(message.Route)).Inc()
+
+	// track 发送client消息大小
+	prometheus.GateServerSendToClientMessageBytesGauge.WithLabelValues(p.gate.proxy.GetServerIP(), p.gate.proxy.GetServerPort(), xconv.String(message.Route)).Set(float64(len(message.Buffer)))
+
 	return n, err
 }
 
