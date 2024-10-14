@@ -133,11 +133,11 @@ func (r *registrar) register(ctx context.Context, ins *registry.ServiceInstance)
 	}
 
 	//注册metrics服务
-	if r.registry.opts.metricsEnable {
+	if r.registry.opts.metricsEnable && r.registry.opts.exporterEnable {
 		metricsInsId := ins.ID + "-exporter"
 		metricsRegistration := &api.AgentServiceRegistration{
 			ID:      metricsInsId,
-			Name:    fmt.Sprintf("%s%s-exporter", ins.Namespace, ins.Name),
+			Name:    fmt.Sprintf("%s-exporter", ins.Name),
 			Address: overwriteHost,
 			Port:    ins.MetricsPort,
 			TaggedAddresses: map[string]api.ServiceAddress{raw.Scheme: {
@@ -189,7 +189,7 @@ func (r *registrar) deregister(ctx context.Context, ins *registry.ServiceInstanc
 	}
 
 	//解注册metrics服务
-	if r.registry.opts.metricsEnable {
+	if r.registry.opts.metricsEnable && r.registry.opts.exporterEnable {
 		if err := r.registry.opts.client.Agent().ServiceDeregister(ins.ID + "-exporter"); err != nil {
 			return err
 		}
