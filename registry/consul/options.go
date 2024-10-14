@@ -15,7 +15,8 @@ const (
 	defaultHeartbeatCheckInterval         = 10
 	defaultDeregisterCriticalServiceAfter = 30
 	defaultMetricsEnable                  = false
-	defaultFailuresBeforeCritical         = 3
+	defaultExportEnable
+	defaultFailuresBeforeCritical = 3
 )
 
 const (
@@ -27,6 +28,7 @@ const (
 	defaultHeartbeatCheckIntervalKey         = "config.registry.consul.heartbeatCheckInterval"
 	defaultDeregisterCriticalServiceAfterKey = "config.registry.consul.deregisterCriticalServiceAfter"
 	defaultMetricsEnableKey                  = "config.metrics.prometheus.enable"
+	defaultExporterEnableKey                 = "config.metrics.exporter.enable"
 	defaultFailuresBeforeCriticalKey         = "config.registry.consul.failuresBeforeCritical"
 )
 
@@ -72,6 +74,8 @@ type options struct {
 	// metrics enable
 	metricsEnable bool
 
+	exporterEnable bool
+
 	failuresBeforeCritical int
 
 	metaMap map[string]string
@@ -88,6 +92,7 @@ func defaultOptions() *options {
 		heartbeatCheckInterval:         config.Get(defaultHeartbeatCheckIntervalKey, defaultHeartbeatCheckInterval).Int(),
 		deregisterCriticalServiceAfter: config.Get(defaultDeregisterCriticalServiceAfterKey, defaultDeregisterCriticalServiceAfter).Int(),
 		metricsEnable:                  config.Get(defaultMetricsEnableKey, defaultMetricsEnable).Bool(),
+		exporterEnable:                 config.Get(defaultExporterEnableKey, defaultExportEnable).Bool(),
 		failuresBeforeCritical:         config.Get(defaultFailuresBeforeCriticalKey, defaultFailuresBeforeCritical).Int(),
 	}
 }
