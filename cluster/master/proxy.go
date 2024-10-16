@@ -165,3 +165,7 @@ func (p *Proxy) watch(ctx context.Context) {
 
 	p.link.WatchServiceInstance(ctx, cluster.Gate, cluster.Node)
 }
+
+func (p *Proxy) StatWithInsId(ctx context.Context, insId string) (int64, error) {
+	return p.link.StatWithInsId(ctx, session.User, insId)
+}

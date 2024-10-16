@@ -570,6 +570,45 @@ func (l *Link) Stat(ctx context.Context, kind session.Kind) (int64, error) {
 	return total, err
 }
 
+// StatWithInsId 统计会话总数
+func (l *Link) StatWithInsId(ctx context.Context, kind session.Kind, insId string) (int64, error) {
+	total := int64(0)
+	eg, ctx := errgroup.WithContext(ctx)
+	l.gateDispatcher.IterateEndpoint(func(actualInsId string, ep *endpoint.Endpoint) bool {
+		if actualInsId != insId {
+			return true // 跳过不匹配的实例
+		}
+		eg.Go(func() error {
+			client, err := l.opts.Transporter.NewGateClient(ep)
+			if err != nil {
+				return err
+			}
+
+			n, miss, err := client.Stat(ctx, kind)
+			if miss {
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+
+			atomic.AddInt64(&total, n)
+
+			return nil
+		})
+
+		return true
+	})
+
+	err := eg.Wait()
+
+	if total > 0 {
+		return total, nil
+	}
+
+	return total, err
+}
+
 // GetID 获取conn的id
 func (l *Link) GetID(ctx context.Context, args *GetIdArgs) (int64, error) {
 	switch args.Kind {
