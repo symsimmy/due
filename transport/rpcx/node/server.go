@@ -59,9 +59,10 @@ func (e *endpoint) Deliver(ctx context.Context, req *protocol.DeliverRequest, re
 		CID: req.CID,
 		UID: req.UID,
 		Message: &transport.Message{
-			Seq:    req.Message.Seq,
-			Route:  req.Message.Route,
-			Buffer: req.Message.Buffer,
+			Seq:        req.Message.Seq,
+			Route:      req.Message.Route,
+			Buffer:     req.Message.Buffer,
+			KcpChannel: int32(req.Message.KcpChannel),
 		},
 	})
 	if err != nil {

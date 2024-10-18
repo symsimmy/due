@@ -9,4 +9,10 @@ message Message {
   int32 Route = 2;  // 路由
   bytes Buffer = 3; // 消息内容
   bool Compress = 4; // 消息是否压缩
+  KcpChannel KcpChannel = 5;
+}
+
+enum KcpChannel {
+  Reliable = 0;
+  Unreliable = 1;
 }

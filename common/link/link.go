@@ -348,9 +348,10 @@ func (l *Link) directPush(ctx context.Context, args *PushArgs) error {
 	}
 
 	_, err = client.Push(ctx, args.Kind, args.Target, &transport.Message{
-		Seq:    args.Message.Seq,
-		Route:  args.Message.Route,
-		Buffer: buffer,
+		Seq:        args.Message.Seq,
+		Route:      args.Message.Route,
+		Buffer:     buffer,
+		KcpChannel: int32(args.Message.KcpChannel),
 	})
 	return err
 }
@@ -364,9 +365,10 @@ func (l *Link) indirectPush(ctx context.Context, args *PushArgs) error {
 
 	_, err = l.doGateRPC(ctx, args.Target, func(client transport.GateClient) (bool, interface{}, error) {
 		miss, err := client.Push(ctx, session.User, args.Target, &transport.Message{
-			Seq:    args.Message.Seq,
-			Route:  args.Message.Route,
-			Buffer: buffer,
+			Seq:        args.Message.Seq,
+			Route:      args.Message.Route,
+			Buffer:     buffer,
+			KcpChannel: int32(args.Message.KcpChannel),
 		})
 		return miss, nil, err
 	})
@@ -735,9 +737,10 @@ func (l *Link) Deliver(ctx context.Context, args *DeliverArgs) error {
 	switch msg := args.Message.(type) {
 	case *packet.Message:
 		arguments.Message = &transport.Message{
-			Seq:    msg.Seq,
-			Route:  msg.Route,
-			Buffer: msg.Buffer,
+			Seq:        msg.Seq,
+			Route:      msg.Route,
+			Buffer:     msg.Buffer,
+			KcpChannel: int32(msg.KcpChannel),
 		}
 	case *Message:
 		buffer, err := l.toBuffer(msg.Data, false)
@@ -745,9 +748,10 @@ func (l *Link) Deliver(ctx context.Context, args *DeliverArgs) error {
 			return err
 		}
 		arguments.Message = &transport.Message{
-			Seq:    msg.Seq,
-			Route:  msg.Route,
-			Buffer: buffer,
+			Seq:        msg.Seq,
+			Route:      msg.Route,
+			Buffer:     buffer,
+			KcpChannel: int32(msg.KcpChannel),
 		}
 	default:
 		return ErrInvalidMessage

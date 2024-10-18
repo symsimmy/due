@@ -34,9 +34,10 @@ func (c *Client) Deliver(ctx context.Context, args *transport.DeliverArgs) (miss
 		CID: args.CID,
 		UID: args.UID,
 		Message: &protocol.Message{
-			Seq:    args.Message.Seq,
-			Route:  args.Message.Route,
-			Buffer: args.Message.Buffer,
+			Seq:        args.Message.Seq,
+			Route:      args.Message.Route,
+			Buffer:     args.Message.Buffer,
+			KcpChannel: protocol.KcpChannel(args.Message.KcpChannel),
 		}}
 	reply := &protocol.DeliverReply{}
 	err = c.cli.Call(ctx, ServicePath, serviceDeliverMethod, req, reply)

@@ -3,6 +3,7 @@ package node
 import (
 	"context"
 	"github.com/symsimmy/due/cluster"
+	"github.com/symsimmy/due/common/link"
 	"github.com/symsimmy/due/log"
 	"sync"
 )
@@ -96,7 +97,7 @@ func (r *Router) Group(groups ...func(group *RouterGroup)) *RouterGroup {
 	return group
 }
 
-func (r *Router) deliver(gid, nid string, cid, uid int64, seq, route int32, data interface{}) {
+func (r *Router) deliver(gid, nid string, cid, uid int64, seq, route int32, data interface{}, kcpChannel int32) {
 	ctx := r.ctxPool.Get().(*Context)
 	ctx.Request.GID = gid
 	ctx.Request.NID = nid
@@ -105,6 +106,7 @@ func (r *Router) deliver(gid, nid string, cid, uid int64, seq, route int32, data
 	ctx.Request.Message.Seq = seq
 	ctx.Request.Message.Route = route
 	ctx.Request.Message.Data = data
+	ctx.Request.Message.KcpChannel = link.KcpChannel(kcpChannel)
 	r.ctxChan <- ctx
 }
 

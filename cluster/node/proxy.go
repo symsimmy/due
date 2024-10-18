@@ -247,13 +247,14 @@ func (p *Proxy) Deliver(ctx context.Context, args *DeliverArgs) error {
 			UID: args.UID,
 			CID: args.CID,
 			Message: &Message{
-				Seq:   args.Message.Seq,
-				Route: args.Message.Route,
-				Data:  args.Message.Data,
+				Seq:        args.Message.Seq,
+				Route:      args.Message.Route,
+				Data:       args.Message.Data,
+				KcpChannel: args.Message.KcpChannel,
 			},
 		})
 	} else {
-		p.node.router.deliver("", args.NID, 0, args.UID, args.Message.Seq, args.Message.Route, args.Message.Data)
+		p.node.router.deliver("", args.NID, 0, args.UID, args.Message.Seq, args.Message.Route, args.Message.Data, int32(args.Message.KcpChannel))
 	}
 
 	return nil
@@ -291,9 +292,10 @@ func (p *Proxy) Response(ctx context.Context, req *Request, message interface{})
 			Kind:   session.Conn,
 			Target: req.CID,
 			Message: &Message{
-				Seq:   req.Message.Seq,
-				Route: req.Message.Route,
-				Data:  message,
+				Seq:        req.Message.Seq,
+				Route:      req.Message.Route,
+				Data:       message,
+				KcpChannel: req.Message.KcpChannel,
 			},
 		})
 	case req.NID != "":
@@ -301,9 +303,10 @@ func (p *Proxy) Response(ctx context.Context, req *Request, message interface{})
 			NID: req.NID,
 			UID: req.UID,
 			Message: &Message{
-				Seq:   req.Message.Seq,
-				Route: req.Message.Route,
-				Data:  message,
+				Seq:        req.Message.Seq,
+				Route:      req.Message.Route,
+				Data:       message,
+				KcpChannel: req.Message.KcpChannel,
 			},
 		})
 	}
