@@ -70,7 +70,7 @@ func (s *Server) OnTraffic(c gnet.Conn) (action gnet.Action) {
 		v, err := s.receiveHandler(data.Route, data.Data)
 
 		if err != nil {
-			log.Debugf("server receive messageId:[%+v],handler[route=%+v] failed.err:%+v", data.Route, data.MessageId, err)
+			log.Errorf("server receive messageId:[%+v],handler[route=%+v] failed.err:%+v", data.Route, data.MessageId, err)
 		}
 
 		if v != nil {
