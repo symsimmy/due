@@ -86,7 +86,9 @@ func (g *Gate) Init() {
 func (g *Gate) Start() {
 	g.startNetworkServer()
 
-	g.startWsNetworkServer()
+	if g.opts.wsServerEnable {
+		g.startWsNetworkServer()
+	}
 
 	g.startRPCServer()
 
@@ -107,7 +109,9 @@ func (g *Gate) Destroy() {
 
 	g.stopNetworkServer()
 
-	g.stopWsNetworkServer()
+	if g.opts.wsServerEnable {
+		g.stopWsNetworkServer()
+	}
 
 	g.stopRPCServer()
 
