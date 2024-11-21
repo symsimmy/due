@@ -40,9 +40,10 @@ func (c *Client) Deliver(ctx context.Context, args *transport.DeliverArgs) (miss
 		CID: args.CID,
 		UID: args.UID,
 		Message: &pb.Message{
-			Seq:    args.Message.Seq,
-			Route:  args.Message.Route,
-			Buffer: args.Message.Buffer,
+			Seq:        args.Message.Seq,
+			Route:      args.Message.Route,
+			Buffer:     args.Message.Buffer,
+			KcpChannel: pb.KcpChannel(args.Message.KcpChannel),
 		},
 	}, grpc.UseCompressor(gzip.Name))
 

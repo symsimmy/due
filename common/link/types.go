@@ -24,10 +24,18 @@ type GetIdArgs struct {
 }
 
 type Message struct {
-	Seq   int32       // 序列号
-	Route int32       // 路由ID
-	Data  interface{} // 消息数据，接收json、proto、[]byte
+	Seq        int32       // 序列号
+	Route      int32       // 路由ID
+	Data       interface{} // 消息数据，接收json、proto、[]byte
+	KcpChannel KcpChannel
 }
+
+type KcpChannel int32
+
+const (
+	Reliable   KcpChannel = iota // Reliable = 0
+	Unreliable                   // Unreliable = 1
+)
 
 type PushArgs struct {
 	GID     string       // 网关ID，会话类型为用户时可忽略此参数

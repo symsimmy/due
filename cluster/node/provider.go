@@ -70,7 +70,7 @@ func (p *provider) Deliver(ctx context.Context, args *transport.DeliverArgs) (bo
 		}
 	}
 
-	p.node.router.deliver(args.GID, args.NID, args.CID, args.UID, args.Message.Seq, args.Message.Route, args.Message.Buffer)
+	p.node.router.deliver(args.GID, args.NID, args.CID, args.UID, args.Message.Seq, args.Message.Route, args.Message.Buffer, args.Message.KcpChannel)
 
 	return false, nil
 }
